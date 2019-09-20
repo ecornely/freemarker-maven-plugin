@@ -27,17 +27,20 @@ import java.util.Map;
 class OutputGenerator {
 	public final long pomModifiedTimestamp;
 	public final Path generatorLocation;
+	public final String templateName;
 	public final Path templateLocation;
 	public final Path outputLocation;
 	public final Map<String,Object> dataModel;
 	private OutputGenerator(
 		 long pomModifiedTimestamp,
 		 Path generatorLocation,
+		 String templateName, 
 		 Path templateLocation,
 		 Path outputLocation,
 		 Map<String, Object> dataModel) {
 		this.pomModifiedTimestamp = pomModifiedTimestamp;
 		this.generatorLocation = generatorLocation;
+		this.templateName = templateName;
 		this.templateLocation = templateLocation;
 		this.outputLocation = outputLocation;
 		this.dataModel = dataModel;
@@ -55,6 +58,7 @@ class OutputGenerator {
 	public static class OutputGeneratorBuilder {
 		private long pomModifiedTimestamp = Long.MAX_VALUE;
 		private Path generatorLocation = null;
+		private String templateName = null;
 		private Path templateLocation = null;
 		private Path outputLocation = null;
 		private Map<String,Object> dataModel = null;
@@ -69,9 +73,14 @@ class OutputGenerator {
 			return this;
 		}
 
-		public OutputGeneratorBuilder addTemplateLocation(Path templateLocation) {
-			this.templateLocation = templateLocation;
+		public OutputGeneratorBuilder addTemplateName(String templateName) {
+			this.templateName = templateName;
 			return this;
+		}
+		
+		public OutputGeneratorBuilder addTemplateLocation(Path templateLocation) {
+		  this.templateLocation = templateLocation;
+		  return this;
 		}
 
 		public OutputGeneratorBuilder addOutputLocation(Path outputLocation) {
@@ -100,9 +109,10 @@ class OutputGenerator {
 			if (pomModifiedTimestamp == Long.MAX_VALUE) throw new IllegalStateException("Must set the pomModifiedTimestamp");
 			if (generatorLocation == null) throw new IllegalStateException("Must set a non-null generatorLocation");
 			if (templateLocation == null) throw new IllegalStateException("Must set a non-null templateLocation");
+			if (templateName == null) templateName = templateLocation.toFile().getName();
 			if (outputLocation == null) throw new IllegalStateException("Must set a non-null outputLocation");
 			if (dataModel == null) throw new IllegalStateException("Must set a non-null dataModel");
-			return new OutputGenerator(pomModifiedTimestamp, generatorLocation, templateLocation, outputLocation, dataModel);
+			return new OutputGenerator(pomModifiedTimestamp, generatorLocation, templateName, templateLocation, outputLocation, dataModel);
 		}
 	}
 
@@ -136,7 +146,7 @@ class OutputGenerator {
 
 		Template template;
 		try {
-			template = config.getTemplate(templateFile.getName());
+			template = config.getTemplate(templateName);
 		} catch (Throwable t) {
 			throw new RuntimeException("Could not read template: " + templateFile.getName(), t);
 		}

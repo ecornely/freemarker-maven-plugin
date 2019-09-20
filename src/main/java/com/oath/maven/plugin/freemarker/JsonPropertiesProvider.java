@@ -51,6 +51,7 @@ public class JsonPropertiesProvider implements OutputGeneratorPropertiesProvider
 		if (obj == null) {
 			throw new RuntimeException("Require json data property not found: templateName");
 		}
+		builder.addTemplateName(obj.toString());
 		builder.addTemplateLocation(templateDir.toPath().resolve(obj.toString()));
 
 		String dataDirName = dataDir.getAbsolutePath();
